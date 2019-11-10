@@ -3,6 +3,7 @@
 * [Requirements](#requirements)
 * [Logging](#logging)
 * [Setup](#setup)
+* [Authors](#authors)
 
 ## General info
 Simple string protocol communicating over TCP sockets.
@@ -21,3 +22,6 @@ Application logs are stored in **logs/app.log** file. Configuration file path **
  
 #### How to run the tool
 * Use java command `java -jar interview-app-1.0-SNAPSHOT.jar`.
+
+## Authors
+* **Mateusz Wieczorek** - wskmateusz@gmail.com
