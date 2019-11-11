@@ -29,11 +29,11 @@ public class DirectedGraph {
         return result;
     }
 
-    public boolean addNode(final Node node) {
+    public synchronized boolean addNode(final Node node) {
         return graph.addVertex(node);
     }
 
-    public boolean addEdge(final Edge edge) {
+    public synchronized boolean addEdge(final Edge edge) {
         try {
             if (graph.addEdge(edge.getSource(), edge.getTarget(), edge)) {
                 graph.setEdgeWeight(edge, edge.getWeight());
@@ -45,11 +45,11 @@ public class DirectedGraph {
         return false;
     }
 
-    public boolean removeNode(final Node node) {
+    public synchronized boolean removeNode(final Node node) {
         return graph.removeVertex(node);
     }
 
-    public boolean removeEdge(final Node source, final Node target) {
+    public synchronized boolean removeEdge(final Node source, final Node target) {
         final Set<Edge> removedEdges = graph.removeAllEdges(source, target);
         return removedEdges != null && !removedEdges.isEmpty();
     }
