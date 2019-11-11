@@ -19,6 +19,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class MessageResolver {
 
     private static final String UNSUPPORTED_COMMAND = "SORRY, I DID NOT UNDERSTAND THAT";
+    private static final String NODE_NOT_FOUND_MESSAGE = "ERROR: NODE NOT FOUND";
     private static final String ALPHANUMERIC_DASH_REGEXP = "[-a-zA-Z0-9]*";
     private final DirectedGraph graph;
     @Getter
@@ -130,7 +131,7 @@ public class MessageResolver {
         if (graph.addEdge(edge)) {
             return "EDGE ADDED";
         }
-        return "ERROR: NODE NOT FOUND";
+        return NODE_NOT_FOUND_MESSAGE;
     }
 
     private String removeNode(String message) {
@@ -139,7 +140,7 @@ public class MessageResolver {
         if (graph.removeNode(node)) {
             return "NODE REMOVED";
         }
-        return "ERROR: NODE NOT FOUND";
+        return NODE_NOT_FOUND_MESSAGE;
     }
 
     private String removeEdge(String message) {
@@ -148,7 +149,7 @@ public class MessageResolver {
         if (graph.removeEdge(new Node(source), new Node(target))) {
             return "EDGE REMOVED";
         }
-        return "ERROR: NODE NOT FOUND";
+        return NODE_NOT_FOUND_MESSAGE;
     }
 
 }
