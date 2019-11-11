@@ -35,7 +35,8 @@ public class MessageResolver {
             "^ADD NODE " + ALPHANUMERIC_DASH_REGEXP + "$",
             "^ADD EDGE " + ALPHANUMERIC_DASH_REGEXP + " " + ALPHANUMERIC_DASH_REGEXP + " \\d+$",
             "^REMOVE NODE " + ALPHANUMERIC_DASH_REGEXP + "$",
-            "^REMOVE EDGE " + ALPHANUMERIC_DASH_REGEXP + " " + ALPHANUMERIC_DASH_REGEXP + "$");
+            "^REMOVE EDGE " + ALPHANUMERIC_DASH_REGEXP + " " + ALPHANUMERIC_DASH_REGEXP + "$",
+            "^SHORTEST PATH " + ALPHANUMERIC_DASH_REGEXP + " " + ALPHANUMERIC_DASH_REGEXP + "$");
 
     public MessageResolver(final DirectedGraph graph) {
         this.graph = graph;
@@ -43,8 +44,9 @@ public class MessageResolver {
         this.timer = Instant.now();
     }
 
-    public void updateTimer() {
+    public Instant updateTimer() {
         timer = Instant.now();
+        return timer;
     }
 
     public String getWelcomeMessage() {
@@ -74,9 +76,10 @@ public class MessageResolver {
             return removeNode(message);
         } else if (message.startsWith("REMOVE EDGE")) {
             return removeEdge(message);
-        } else {
-            throw new IllegalArgumentException("Can not resolve message: " + message);
+        } else if (message.startsWith("SHORTEST PATH")) {
+            return calculateShortestPath(message);
         }
+        throw new IllegalArgumentException("Can not resolve message: " + message);
     }
 
     boolean isNotSupported(final String message) {
@@ -86,7 +89,7 @@ public class MessageResolver {
 
     private String generateGoodbyeMessage() {
         if (clientName == null) {
-            throw new IllegalStateException("Can not generate timeout message without client name");
+            throw new IllegalStateException("Can not generate timeout message without client name.");
         }
         return "BYE " + clientName + ", WE SPOKE FOR " + Duration.between(timer, Instant.now()).toMillis() + " MS";
     }
@@ -150,6 +153,16 @@ public class MessageResolver {
             return "EDGE REMOVED";
         }
         return NODE_NOT_FOUND_MESSAGE;
+    }
+
+    private String calculateShortestPath(String message) {
+        final String source = getPhraseAtPosition(message, 3);
+        final String target = getPhraseAtPosition(message, 4);
+        try {
+            return String.valueOf(graph.findTheShortestPath(new Node(source), new Node(target)));
+        } catch (Exception e) {
+            return NODE_NOT_FOUND_MESSAGE;
+        }
     }
 
 }

@@ -1,5 +1,7 @@
 package com.collibra.interview.graph;
 
+import org.jgrapht.GraphPath;
+import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 
 import java.util.Set;
@@ -52,5 +54,28 @@ public class DirectedGraph {
     public synchronized boolean removeEdge(final Node source, final Node target) {
         final Set<Edge> removedEdges = graph.removeAllEdges(source, target);
         return removedEdges != null && !removedEdges.isEmpty();
+    }
+
+    /**
+     * Calculate the shortest path between two nodes in the directed graph
+     *
+     * @param source    source node
+     * @param target    target node
+     * @return int      sum of the the shortest weights
+     *                  {@code -1} if node not exists
+     *                  {@code Integer.MAX_VALUE} if not exists connection between nodes
+     */
+    public synchronized int findTheShortestPath(Node source, Node target) {
+        GraphPath<Node, Edge> shortestPath = DijkstraShortestPath.findPathBetween(graph, source, target);
+        if (shortestPath == null) {
+            return Integer.MAX_VALUE;
+        }
+        if (shortestPath.getEdgeList().isEmpty()) {
+            return -1;
+        }
+        return shortestPath.getEdgeList()
+                           .stream()
+                           .map(Edge::getWeight)
+                           .reduce(0, Integer::sum);
     }
 }
