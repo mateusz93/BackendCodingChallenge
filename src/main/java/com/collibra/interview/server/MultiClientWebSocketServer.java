@@ -11,6 +11,7 @@ import java.net.Socket;
 @RequiredArgsConstructor
 public class MultiClientWebSocketServer {
 
+    private static final int TIMEOUT_IN_MS = 30_000;
     private final int port;
 
     @SneakyThrows
@@ -19,7 +20,7 @@ public class MultiClientWebSocketServer {
             while (true) {
                 try (final Socket socket = serverSocket.accept()) {
                     log.debug("Starting new socket on port: " + port);
-                    new WebSocketServer(socket).run();
+                    new WebSocketServer(socket,TIMEOUT_IN_MS).run();
                 }
             }
         }

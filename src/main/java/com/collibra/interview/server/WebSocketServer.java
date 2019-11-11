@@ -1,59 +1,44 @@
 package com.collibra.interview.server;
 
+import com.collibra.interview.core.MessageResolver;
+import com.collibra.interview.core.exception.UnsupportedCommandException;
+import com.collibra.interview.graph.DirectedGraph;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.UUID;
 
 @Slf4j
 public class WebSocketServer implements Runnable {
 
-    private static final String UNSUPPORTED_COMMAND = "SORRY, I DID NOT UNDERSTAND THAT";
     private static final String CLIENT_PREFIX = "[CLIENT] ";
     private static final String SERVER_PREFIX = "[SERVER] ";
-    private static final int TIMEOUT_IN_MS = 30 * 1_000;
+    private final MessageResolver messageResolver;
     private final Socket socket;
+    private final int timeoutInMs;
     private PrintWriter out;
-    private String clientName;
 
     @SneakyThrows
-    WebSocketServer(Socket socket) {
+    WebSocketServer(final Socket socket, final int timeoutInMs) {
         this.socket = socket;
-        this.socket.setSoTimeout(TIMEOUT_IN_MS);
+        this.socket.setSoTimeout(timeoutInMs);
+        this.timeoutInMs = timeoutInMs;
+        this.messageResolver = new MessageResolver(DirectedGraph.getInstance());
     }
 
     @SneakyThrows
     public void run() {
-        Instant start = Instant.now();
+        messageResolver.updateTimer();
         try (final BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
             out = new PrintWriter(socket.getOutputStream(), true);
-            sendGreetingsMessage();
+            sendWelcomeMessage();
             String clientMessage;
             while ((clientMessage = in.readLine()) != null) {
-                log.info(CLIENT_PREFIX + clientMessage);
-                if (SupportedMessages.isSupported(clientMessage)) {
-                    if (clientMessage.startsWith("HI")) {
-                        clientName = getClientName(clientMessage);
-                        log.info(SERVER_PREFIX + "HI " + clientName);
-                        out.println("HI " + clientName);
-                    }
-                    if (clientMessage.startsWith("BYE")) {
-                        Instant end = Instant.now();
-                        log.info(SERVER_PREFIX + "BYE " + clientName + ", WE SPOKE FOR " + Duration.between(start, end).toMillis() + " MS");
-                        out.println("BYE " + clientName + ", WE SPOKE FOR " + Duration.between(start, end).toMillis() + " MS");
-                        break;
-                    }
-                } else {
-                    sendUnsupportedCommandMessage();
-                }
+                sendAnswer(clientMessage);
             }
         } catch (SocketTimeoutException e) {
             sendTimeoutMessage();
@@ -64,28 +49,26 @@ public class WebSocketServer implements Runnable {
         }
     }
 
-    private void sendGreetingsMessage() {
-        final String greetings = "HI, I AM " + generateSessionId();
-        log.info(SERVER_PREFIX + greetings);
-        out.println(greetings);
+    private void sendAnswer(String clientMessage) {
+        log.info(CLIENT_PREFIX + clientMessage);
+        try {
+            final String serverAnswer = messageResolver.resolve(clientMessage);
+            log.info(SERVER_PREFIX + serverAnswer);
+            out.println(serverAnswer);
+        } catch (UnsupportedCommandException e) {
+            log.info(SERVER_PREFIX + e.getMessage());
+            out.println(e.getMessage());
+        }
     }
 
-    private void sendUnsupportedCommandMessage() {
-        log.info(SERVER_PREFIX + UNSUPPORTED_COMMAND);
-        out.println(UNSUPPORTED_COMMAND);
+    private void sendWelcomeMessage() {
+        log.info(SERVER_PREFIX + messageResolver.getWelcomeMessage());
+        out.println(messageResolver.getWelcomeMessage());
     }
 
     private void sendTimeoutMessage() {
-        final String timeoutMessage = "BYE " + clientName + ", WE SPOKE FOR " + TIMEOUT_IN_MS + " MS";
-        log.info(SERVER_PREFIX + timeoutMessage);
-        out.println(timeoutMessage);
+        log.info(SERVER_PREFIX + messageResolver.getTimeoutMessage(timeoutInMs));
+        out.println(messageResolver.getTimeoutMessage(timeoutInMs));
     }
 
-    private String getClientName(final String message) {
-        return StringUtils.substringAfterLast(message, " ");
-    }
-
-    private UUID generateSessionId() {
-        return UUID.randomUUID();
-    }
 }
