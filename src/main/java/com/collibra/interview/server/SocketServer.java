@@ -30,7 +30,6 @@ public class SocketServer implements Runnable {
         this.messageProcessor = new MessageProcessor(DirectedGraph.getInstance());
     }
 
-    @SneakyThrows
     public void run() {
         log.debug("Starting new single client socket server");
         messageProcessor.resetTimer();
@@ -43,10 +42,13 @@ public class SocketServer implements Runnable {
             }
         } catch (SocketTimeoutException e) {
             sendTimeoutMessage();
+        } catch (Exception e) {
+            log.error("Unexpected exception occurred: ", e);
         } finally {
             if (out != null) {
                 out.close();
             }
+            log.info("Single client socket server closed");
         }
     }
 
