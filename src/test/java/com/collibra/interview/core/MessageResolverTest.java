@@ -61,7 +61,7 @@ class MessageResolverTest {
         final Instant before = Instant.now();
 
         // when
-        final Instant resolverTime = resolver.updateTimer();
+        final Instant resolverTime = resolver.resetTimer();
 
         // then
         assertTrue((before.isBefore(resolverTime) || before.equals(resolverTime)) &&
@@ -169,5 +169,21 @@ class MessageResolverTest {
         resolver.resolve("ADD NODE phase3-node3");
         resolver.resolve("ADD EDGE phase3-node1 phase3-node2 12");
         assertEquals(String.valueOf(Integer.MAX_VALUE), resolver.resolve("SHORTEST PATH phase3-node1 phase3-node3"));
+    }
+
+    @Test
+    void shouldFindAllCloserNodesThan() throws UnsupportedCommandException {
+        resolver.resolve("ADD NODE phase3-node1");
+        resolver.resolve("ADD NODE phase3-node2");
+        resolver.resolve("ADD NODE phase3-node3");
+        resolver.resolve("ADD NODE phase3-node4");
+        resolver.resolve("ADD EDGE phase3-node1 phase3-node3 10");
+        resolver.resolve("ADD EDGE phase3-node1 phase3-node2 12");
+        resolver.resolve("ADD EDGE phase3-node2 phase3-node4 15");
+        assertEquals("ERROR: NODE NOT FOUND", resolver.resolve("CLOSER THAN 5 phase3-node5"));
+        assertEquals("phase3-node1", resolver.resolve("CLOSER THAN 0 phase3-node1"));
+        assertEquals("phase3-node3", resolver.resolve("CLOSER THAN 11 phase3-node1"));
+        assertEquals("phase3-node2,phase3-node3", resolver.resolve("CLOSER THAN 13 phase3-node1"));
+
     }
 }

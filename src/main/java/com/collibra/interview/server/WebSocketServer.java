@@ -32,7 +32,7 @@ public class WebSocketServer implements Runnable {
 
     @SneakyThrows
     public void run() {
-        messageResolver.updateTimer();
+        messageResolver.resetTimer();
         try (final BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
             out = new PrintWriter(socket.getOutputStream(), true);
             sendWelcomeMessage();

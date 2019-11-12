@@ -36,7 +36,8 @@ public class MessageResolver {
             "^ADD EDGE " + ALPHANUMERIC_DASH_REGEXP + " " + ALPHANUMERIC_DASH_REGEXP + " \\d+$",
             "^REMOVE NODE " + ALPHANUMERIC_DASH_REGEXP + "$",
             "^REMOVE EDGE " + ALPHANUMERIC_DASH_REGEXP + " " + ALPHANUMERIC_DASH_REGEXP + "$",
-            "^SHORTEST PATH " + ALPHANUMERIC_DASH_REGEXP + " " + ALPHANUMERIC_DASH_REGEXP + "$");
+            "^SHORTEST PATH " + ALPHANUMERIC_DASH_REGEXP + " " + ALPHANUMERIC_DASH_REGEXP + "$",
+            "^CLOSER THAN " + "\\d+ " + ALPHANUMERIC_DASH_REGEXP + "$");
 
     public MessageResolver(final DirectedGraph graph) {
         this.graph = graph;
@@ -44,7 +45,7 @@ public class MessageResolver {
         this.timer = Instant.now();
     }
 
-    public Instant updateTimer() {
+    public Instant resetTimer() {
         timer = Instant.now();
         return timer;
     }
@@ -78,6 +79,8 @@ public class MessageResolver {
             return removeEdge(message);
         } else if (message.startsWith("SHORTEST PATH")) {
             return calculateShortestPath(message);
+        } else if (message.startsWith("CLOSER THAN")) {
+            return findAllCloserNodes(message);
         }
         throw new IllegalArgumentException("Can not resolve message: " + message);
     }
@@ -158,9 +161,26 @@ public class MessageResolver {
     private String calculateShortestPath(String message) {
         final String source = getPhraseAtPosition(message, 3);
         final String target = getPhraseAtPosition(message, 4);
+        final int shortestPath = graph.findTheShortestPath(new Node(source), new Node(target));
+        if (shortestPath == -1) {
+            return NODE_NOT_FOUND_MESSAGE;
+        }
+        return String.valueOf(shortestPath);
+    }
+
+    private String findAllCloserNodes(final String message) {
+        final int weight = Integer.parseInt(getPhraseAtPosition(message, 3));
+        final String nodeName = getPhraseAtPosition(message, 4);
         try {
-            return String.valueOf(graph.findTheShortestPath(new Node(source), new Node(target)));
-        } catch (Exception e) {
+            final List<Node> nodes = graph.findAllCloserNodesThan(new Node(nodeName), weight);
+            if (nodes.isEmpty()) {
+                return nodeName;
+            }
+            return nodes.map(Node::getName)
+                        .sorted()
+                        .reduce((a, b) -> a + "," + b)
+                        .trim();
+        } catch (IllegalArgumentException e) {
             return NODE_NOT_FOUND_MESSAGE;
         }
     }
