@@ -18,7 +18,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 @Slf4j
 public class MessageProcessor {
 
-    private static final String UNSUPPORTED_COMMAND = "SORRY, I DID NOT UNDERSTAND THAT";
     private static final String NODE_NOT_FOUND_MESSAGE = "ERROR: NODE NOT FOUND";
     private static final String ALPHANUMERIC_DASH_REGEXP = "[-a-zA-Z0-9]*";
     private final DirectedGraph graph;
@@ -58,7 +57,7 @@ public class MessageProcessor {
 
     public String process(final String message) throws UnsupportedCommandException {
         if (isNotSupported(message)) {
-            throw new UnsupportedCommandException(UNSUPPORTED_COMMAND);
+            throw new UnsupportedCommandException();
         }
         if (message.startsWith("HI, I AM")) {
             return generateGreetingsMessage(message);
