@@ -2,11 +2,10 @@ package com.collibra.interview.graph;
 
 import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
-import org.apache.commons.collections4.CollectionUtils;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.connectivity.ConnectivityInspector;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
-import org.jgrapht.graph.SimpleDirectedWeightedGraph;
+import org.jgrapht.graph.DirectedWeightedMultigraph;
 
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -14,13 +13,13 @@ import javax.annotation.concurrent.ThreadSafe;
 public class DirectedGraph {
 
     private static volatile DirectedGraph instance;
-    private final SimpleDirectedWeightedGraph<Node, Edge> graph;
+    private final DirectedWeightedMultigraph<Node, Edge> graph;
 
     private DirectedGraph() {
         if (instance != null) {
             throw new IllegalStateException("Already initialized.");
         }
-        graph = new SimpleDirectedWeightedGraph<>(Edge.class);
+        graph = new DirectedWeightedMultigraph<>(Edge.class);
     }
 
     public static DirectedGraph getInstance() {
@@ -44,12 +43,9 @@ public class DirectedGraph {
         if (!graph.containsVertex(edge.getSource()) || !graph.containsVertex(edge.getTarget())) {
             return false;
         }
-        removeEdge(edge.getSource(), edge.getTarget());
-        if (graph.addEdge(edge.getSource(), edge.getTarget(), edge)) {
-            graph.setEdgeWeight(edge, edge.getWeight());
-            return true;
-        }
-        return false;
+        graph.addEdge(edge.getSource(), edge.getTarget(), edge);
+        graph.setEdgeWeight(edge, edge.getWeight());
+        return true;
     }
 
     public synchronized boolean removeNode(final Node node) {
@@ -57,7 +53,11 @@ public class DirectedGraph {
     }
 
     public synchronized boolean removeEdge(final Node source, final Node target) {
-        return CollectionUtils.isNotEmpty(graph.removeAllEdges(source, target));
+        if (!graph.containsVertex(source) || !graph.containsVertex(target)) {
+            return false;
+        }
+        graph.removeAllEdges(source, target);
+        return true;
     }
 
     /**
