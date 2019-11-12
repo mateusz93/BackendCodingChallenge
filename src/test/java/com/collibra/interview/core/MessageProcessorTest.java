@@ -181,7 +181,7 @@ class MessageProcessorTest {
         resolver.process("ADD EDGE phase3-node1 phase3-node2 12");
         resolver.process("ADD EDGE phase3-node2 phase3-node4 15");
         assertEquals("ERROR: NODE NOT FOUND", resolver.process("CLOSER THAN 5 phase3-node5"));
-        assertEquals("phase3-node1", resolver.process("CLOSER THAN 0 phase3-node1"));
+        assertEquals("", resolver.process("CLOSER THAN 0 phase3-node1"));
         assertEquals("phase3-node3", resolver.process("CLOSER THAN 11 phase3-node1"));
         assertEquals("phase3-node2,phase3-node3", resolver.process("CLOSER THAN 13 phase3-node1"));
 

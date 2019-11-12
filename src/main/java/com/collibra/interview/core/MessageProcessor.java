@@ -174,7 +174,7 @@ public class MessageProcessor {
         try {
             final List<Node> nodes = graph.findAllCloserNodesThan(new Node(nodeName), weight);
             if (nodes.isEmpty()) {
-                return nodeName;
+                return "";
             }
             return nodes.map(Node::getName)
                         .sorted()
