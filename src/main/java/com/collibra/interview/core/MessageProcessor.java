@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 import static com.google.common.base.Preconditions.checkArgument;
 
 @Slf4j
-public class MessageResolver {
+public class MessageProcessor {
 
     private static final String UNSUPPORTED_COMMAND = "SORRY, I DID NOT UNDERSTAND THAT";
     private static final String NODE_NOT_FOUND_MESSAGE = "ERROR: NODE NOT FOUND";
@@ -39,7 +39,7 @@ public class MessageResolver {
             "^SHORTEST PATH " + ALPHANUMERIC_DASH_REGEXP + " " + ALPHANUMERIC_DASH_REGEXP + "$",
             "^CLOSER THAN " + "\\d+ " + ALPHANUMERIC_DASH_REGEXP + "$");
 
-    public MessageResolver(final DirectedGraph graph) {
+    public MessageProcessor(final DirectedGraph graph) {
         this.graph = graph;
         this.sessionId = UUID.randomUUID();
         this.timer = Instant.now();
@@ -61,7 +61,7 @@ public class MessageResolver {
         return "BYE " + clientName + ", WE SPOKE FOR " + ms + " MS";
     }
 
-    public String resolve(final String message) throws UnsupportedCommandException {
+    public String process(final String message) throws UnsupportedCommandException {
         if (isNotSupported(message)) {
             throw new UnsupportedCommandException(UNSUPPORTED_COMMAND);
         }

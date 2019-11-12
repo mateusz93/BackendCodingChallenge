@@ -1,6 +1,6 @@
 package com.collibra.interview.server;
 
-import com.collibra.interview.core.MessageResolver;
+import com.collibra.interview.core.MessageProcessor;
 import com.collibra.interview.core.exception.UnsupportedCommandException;
 import com.collibra.interview.graph.DirectedGraph;
 import lombok.SneakyThrows;
@@ -13,26 +13,27 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 
 @Slf4j
-public class WebSocketServer implements Runnable {
+public class SocketServer implements Runnable {
 
     private static final String CLIENT_PREFIX = "[CLIENT] ";
     private static final String SERVER_PREFIX = "[SERVER] ";
-    private final MessageResolver messageResolver;
+    private final MessageProcessor messageProcessor;
     private final Socket socket;
     private final int timeoutInMs;
     private PrintWriter out;
 
     @SneakyThrows
-    WebSocketServer(final Socket socket, final int timeoutInMs) {
+    SocketServer(final Socket socket, final int timeoutInMs) {
         this.socket = socket;
         this.socket.setSoTimeout(timeoutInMs);
         this.timeoutInMs = timeoutInMs;
-        this.messageResolver = new MessageResolver(DirectedGraph.getInstance());
+        this.messageProcessor = new MessageProcessor(DirectedGraph.getInstance());
     }
 
     @SneakyThrows
     public void run() {
-        messageResolver.resetTimer();
+        log.debug("Starting new single client socket server");
+        messageProcessor.resetTimer();
         try (final BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
             out = new PrintWriter(socket.getOutputStream(), true);
             sendWelcomeMessage();
@@ -52,7 +53,7 @@ public class WebSocketServer implements Runnable {
     private void sendAnswer(String clientMessage) {
         log.info(CLIENT_PREFIX + clientMessage);
         try {
-            final String serverAnswer = messageResolver.resolve(clientMessage);
+            final String serverAnswer = messageProcessor.process(clientMessage);
             log.info(SERVER_PREFIX + serverAnswer);
             out.println(serverAnswer);
         } catch (UnsupportedCommandException e) {
@@ -62,13 +63,13 @@ public class WebSocketServer implements Runnable {
     }
 
     private void sendWelcomeMessage() {
-        log.info(SERVER_PREFIX + messageResolver.getWelcomeMessage());
-        out.println(messageResolver.getWelcomeMessage());
+        log.info(SERVER_PREFIX + messageProcessor.getWelcomeMessage());
+        out.println(messageProcessor.getWelcomeMessage());
     }
 
     private void sendTimeoutMessage() {
-        log.info(SERVER_PREFIX + messageResolver.getTimeoutMessage(timeoutInMs));
-        out.println(messageResolver.getTimeoutMessage(timeoutInMs));
+        log.info(SERVER_PREFIX + messageProcessor.getTimeoutMessage(timeoutInMs));
+        out.println(messageProcessor.getTimeoutMessage(timeoutInMs));
     }
 
 }

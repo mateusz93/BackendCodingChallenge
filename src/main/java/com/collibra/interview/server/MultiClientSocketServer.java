@@ -6,22 +6,24 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Slf4j
 @RequiredArgsConstructor
-public class MultiClientWebSocketServer {
+public class MultiClientSocketServer {
 
     private static final int TIMEOUT_IN_MS = 30_000;
     private final int port;
 
     @SneakyThrows
     public void start() {
+        log.info("Multi client server socket stared and listening on port {}", port);
+        final ExecutorService executor = Executors.newFixedThreadPool(32);
         try (final ServerSocket serverSocket = new ServerSocket(port)) {
             while (true) {
-                try (final Socket socket = serverSocket.accept()) {
-                    log.debug("Starting new socket on port: " + port);
-                    new WebSocketServer(socket,TIMEOUT_IN_MS).run();
-                }
+                Socket socket = serverSocket.accept();
+                executor.submit(new SocketServer(socket, TIMEOUT_IN_MS));
             }
         }
     }

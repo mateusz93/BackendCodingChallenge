@@ -2,14 +2,15 @@ package com.collibra.interview.graph;
 
 import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.connectivity.ConnectivityInspector;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.SimpleDirectedWeightedGraph;
 
-@Slf4j
+import javax.annotation.concurrent.ThreadSafe;
+
+@ThreadSafe
 public class DirectedGraph {
 
     private static volatile DirectedGraph instance;
