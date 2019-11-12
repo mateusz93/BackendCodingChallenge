@@ -32,7 +32,6 @@ public class SocketServer implements Runnable {
 
     public void run() {
         log.debug("Starting new single client socket server");
-        messageProcessor.resetTimer();
         try (final BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
             out = new PrintWriter(socket.getOutputStream(), true);
             sendWelcomeMessage();

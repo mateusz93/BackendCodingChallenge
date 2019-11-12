@@ -8,7 +8,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.lang.reflect.Field;
-import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -53,19 +52,6 @@ class MessageProcessorTest {
     @Test
     void shouldReturnGreetingsMessage() throws UnsupportedCommandException {
         assertEquals("HI John", resolver.process("HI, I AM John"));
-    }
-
-    @Test
-    void shouldVerifyTimerUpdating() {
-        // given
-        final Instant before = Instant.now();
-
-        // when
-        final Instant resolverTime = resolver.resetTimer();
-
-        // then
-        assertTrue((before.isBefore(resolverTime) || before.equals(resolverTime)) &&
-                           (Instant.now().equals(resolverTime) || Instant.now().isAfter(resolverTime)));
     }
 
     @Test

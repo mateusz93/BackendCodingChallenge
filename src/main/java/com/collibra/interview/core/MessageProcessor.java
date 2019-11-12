@@ -45,11 +45,6 @@ public class MessageProcessor {
         this.timer = Instant.now();
     }
 
-    public Instant resetTimer() {
-        timer = Instant.now();
-        return timer;
-    }
-
     public String getWelcomeMessage() {
         return "HI, I AM " + sessionId;
     }
