@@ -1,4 +1,4 @@
-package com.collibra.interview.core.exception;
+package com.collibra.interview.exception;
 
 public class UnsupportedCommandException extends Exception {
 

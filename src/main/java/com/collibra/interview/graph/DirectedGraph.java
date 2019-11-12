@@ -17,7 +17,7 @@ public class DirectedGraph {
 
     private DirectedGraph() {
         if (instance != null) {
-            throw new IllegalStateException("Already initialized.");
+            throw new IllegalStateException("Already initialized");
         }
         graph = new DirectedWeightedMultigraph<>(Edge.class);
     }
@@ -103,7 +103,7 @@ public class DirectedGraph {
      */
     public synchronized List<Node> findAllCloserNodesThan(final Node node, final int weight) {
         if (!graph.containsVertex(node)) {
-            throw new IllegalArgumentException("Node not exists");
+            throw new IllegalArgumentException("Node does not exist");
         }
         final ConnectivityInspector inspector = new ConnectivityInspector(graph);
         return HashSet.ofAll(inspector.connectedSetOf(node))

@@ -1,6 +1,6 @@
 package com.collibra.interview.core;
 
-import com.collibra.interview.core.exception.UnsupportedCommandException;
+import com.collibra.interview.exception.UnsupportedCommandException;
 import com.collibra.interview.graph.DirectedGraph;
 import com.collibra.interview.graph.Edge;
 import com.collibra.interview.graph.Node;
@@ -25,7 +25,7 @@ public class MessageProcessor {
     @Getter
     private final UUID sessionId;
     @Getter
-    private Instant timer;
+    private final Instant timer;
     @Getter
     private String clientName;
 
@@ -87,7 +87,7 @@ public class MessageProcessor {
 
     private String generateGoodbyeMessage() {
         if (clientName == null) {
-            throw new IllegalStateException("Can not generate timeout message without client name.");
+            throw new IllegalStateException("Can not generate timeout message without client name");
         }
         return "BYE " + clientName + ", WE SPOKE FOR " + Duration.between(timer, Instant.now()).toMillis() + " MS";
     }
@@ -105,7 +105,7 @@ public class MessageProcessor {
      * @return text without whitespaces
      */
     private String getPhraseAtPosition(final String text, final int position) {
-        checkArgument(position > 0, "Position must be non-negative positive: %s", position);
+        checkArgument(position > 0, "Position must be positive: %s", position);
         final String[] splittedMessage = text.split("\\s+");
         checkArgument(position <= splittedMessage.length, "Incorrect position. Max value for passed input: %s", splittedMessage.length);
         return splittedMessage[position - 1];

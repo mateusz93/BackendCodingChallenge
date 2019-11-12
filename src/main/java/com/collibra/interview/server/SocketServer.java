@@ -1,15 +1,17 @@
 package com.collibra.interview.server;
 
 import com.collibra.interview.core.MessageProcessor;
-import com.collibra.interview.core.exception.UnsupportedCommandException;
+import com.collibra.interview.exception.UnsupportedCommandException;
 import com.collibra.interview.graph.DirectedGraph;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 @Slf4j
@@ -31,18 +33,18 @@ public class SocketServer implements Runnable {
     }
 
     public void run() {
-        log.debug("Starting new single client socket server");
+        log.info("Starting new single client socket server");
         try (final BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
             out = new PrintWriter(socket.getOutputStream(), true);
             sendWelcomeMessage();
             String clientMessage;
-            while ((clientMessage = in.readLine()) != null) {
+            while ((clientMessage = readClientMessage(in)) != null) {
                 sendAnswer(clientMessage);
             }
         } catch (SocketTimeoutException e) {
             sendTimeoutMessage();
         } catch (Exception e) {
-            log.error("Unexpected exception occurred: ", e);
+            log.error("Unexpected exception occurred", e);
         } finally {
             if (out != null) {
                 out.close();
@@ -51,25 +53,37 @@ public class SocketServer implements Runnable {
         }
     }
 
+    private String readClientMessage(BufferedReader in) throws IOException {
+        try {
+            return in.readLine();
+        } catch (SocketException e) {
+            log.warn("SocketException occurred during reading message from client. No answer will be send.");
+            return "";
+        }
+    }
+
     private void sendAnswer(String clientMessage) {
-        log.info(CLIENT_PREFIX + clientMessage);
+        if (clientMessage.isEmpty()) {
+            return;
+        }
+        log.debug(CLIENT_PREFIX + clientMessage);
         try {
             final String serverAnswer = messageProcessor.process(clientMessage);
-            log.info(SERVER_PREFIX + serverAnswer);
+            log.debug(SERVER_PREFIX + serverAnswer);
             out.println(serverAnswer);
         } catch (UnsupportedCommandException e) {
-            log.info(SERVER_PREFIX + e.getMessage());
+            log.debug(SERVER_PREFIX + e.getMessage());
             out.println(e.getMessage());
         }
     }
 
     private void sendWelcomeMessage() {
-        log.info(SERVER_PREFIX + messageProcessor.getWelcomeMessage());
+        log.debug(SERVER_PREFIX + messageProcessor.getWelcomeMessage());
         out.println(messageProcessor.getWelcomeMessage());
     }
 
     private void sendTimeoutMessage() {
-        log.info(SERVER_PREFIX + messageProcessor.getTimeoutMessage(timeoutInMs));
+        log.debug(SERVER_PREFIX + messageProcessor.getTimeoutMessage(timeoutInMs));
         out.println(messageProcessor.getTimeoutMessage(timeoutInMs));
     }
 

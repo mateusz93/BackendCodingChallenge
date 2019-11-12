@@ -1,6 +1,6 @@
 package com.collibra.interview.core;
 
-import com.collibra.interview.core.exception.UnsupportedCommandException;
+import com.collibra.interview.exception.UnsupportedCommandException;
 import com.collibra.interview.graph.DirectedGraph;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
