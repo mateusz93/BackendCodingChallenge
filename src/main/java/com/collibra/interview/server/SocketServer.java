@@ -53,7 +53,7 @@ public class SocketServer implements Runnable {
         }
     }
 
-    private String readClientMessage(BufferedReader in) throws IOException {
+    private String readClientMessage(final BufferedReader in) throws IOException {
         try {
             return in.readLine();
         } catch (SocketException e) {
@@ -62,7 +62,7 @@ public class SocketServer implements Runnable {
         }
     }
 
-    private void sendAnswer(String clientMessage) {
+    private void sendAnswer(final String clientMessage) {
         if (clientMessage.isEmpty()) {
             return;
         }

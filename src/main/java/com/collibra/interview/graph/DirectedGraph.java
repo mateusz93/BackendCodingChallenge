@@ -79,7 +79,7 @@ public class DirectedGraph {
      *                  {@code -1} if node not exists
      *                  {@code Integer.MAX_VALUE} if not exists connection between nodes
      */
-    public synchronized int findTheShortestPath(Node source, Node target) {
+    public synchronized int findTheShortestPath(final Node source, final Node target) {
         if (!graph.containsVertex(source) || !graph.containsVertex(target)) {
             return -1;
         }

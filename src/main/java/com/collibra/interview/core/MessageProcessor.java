@@ -110,7 +110,7 @@ public class MessageProcessor {
         return splittedMessage[position - 1];
     }
 
-    private String addNode(String message) {
+    private String addNode(final String message) {
         final String nodeName = getPhraseAtPosition(message, 3);
         final Node node = new Node(nodeName);
         if (graph.addNode(node)) {
@@ -119,7 +119,7 @@ public class MessageProcessor {
         return "ERROR: NODE ALREADY EXISTS";
     }
 
-    private String addEdge(String message) {
+    private String addEdge(final String message) {
         final String source = getPhraseAtPosition(message, 3);
         final String target = getPhraseAtPosition(message, 4);
         final int weight = Integer.parseInt(getPhraseAtPosition(message, 5));
@@ -134,7 +134,7 @@ public class MessageProcessor {
         return NODE_NOT_FOUND_MESSAGE;
     }
 
-    private String removeNode(String message) {
+    private String removeNode(final String message) {
         final String nodeName = getPhraseAtPosition(message, 3);
         final Node node = new Node(nodeName);
         if (graph.removeNode(node)) {
@@ -143,7 +143,7 @@ public class MessageProcessor {
         return NODE_NOT_FOUND_MESSAGE;
     }
 
-    private String removeEdge(String message) {
+    private String removeEdge(final String message) {
         final String source = getPhraseAtPosition(message, 3);
         final String target = getPhraseAtPosition(message, 4);
         if (graph.removeEdge(new Node(source), new Node(target))) {
@@ -152,7 +152,7 @@ public class MessageProcessor {
         return NODE_NOT_FOUND_MESSAGE;
     }
 
-    private String calculateShortestPath(String message) {
+    private String calculateShortestPath(final String message) {
         final String source = getPhraseAtPosition(message, 3);
         final String target = getPhraseAtPosition(message, 4);
         final int shortestPath = graph.findTheShortestPath(new Node(source), new Node(target));
