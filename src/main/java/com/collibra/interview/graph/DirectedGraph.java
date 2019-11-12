@@ -39,9 +39,19 @@ public class DirectedGraph {
         return graph.addVertex(node);
     }
 
+    /**
+     * Add egde to graph
+     *
+     * @param edge      edge to add
+     * @return boolean  {@code true} if edge added correctly or if nodes of edge are the same
+     *                  {@code false} if any of the edge nodes does not exist
+     */
     public synchronized boolean addEdge(final Edge edge) {
         if (!graph.containsVertex(edge.getSource()) || !graph.containsVertex(edge.getTarget())) {
             return false;
+        }
+        if (edge.getSource().equals(edge.getTarget())) {
+            return true;
         }
         graph.addEdge(edge.getSource(), edge.getTarget(), edge);
         graph.setEdgeWeight(edge, edge.getWeight());

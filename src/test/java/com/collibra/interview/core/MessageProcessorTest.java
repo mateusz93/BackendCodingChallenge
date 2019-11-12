@@ -102,6 +102,12 @@ class MessageProcessorTest {
     }
 
     @Test
+    void shouldReturnEdgeAddedMessageDuringAddingEdgeWithTwoSameNodes() throws UnsupportedCommandException {
+        resolver.process("ADD NODE phase2-node1");
+        assertEquals("EDGE ADDED", resolver.process("ADD EDGE phase2-node1 phase2-node1 5"));
+    }
+
+    @Test
     void shouldReturnNodeNotFoundMessage() throws UnsupportedCommandException {
         assertEquals("ERROR: NODE NOT FOUND", resolver.process("ADD EDGE phase2-node1 phase2-node2 12"));
     }
