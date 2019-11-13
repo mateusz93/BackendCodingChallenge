@@ -4,6 +4,7 @@ import com.collibra.interview.exception.UnsupportedCommandException;
 import com.collibra.interview.graph.DirectedGraph;
 import com.collibra.interview.graph.Edge;
 import com.collibra.interview.graph.Node;
+import com.collibra.interview.util.StringUtils;
 import io.vavr.collection.List;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -12,8 +13,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 import java.util.regex.Pattern;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 @Slf4j
 public class MessageProcessor {
@@ -92,26 +91,12 @@ public class MessageProcessor {
     }
 
     private String generateGreetingsMessage(final String message) {
-        clientName = getPhraseAtPosition(message, 4);
+        clientName = StringUtils.phraseAtPosition(message, 4);
         return "HI " + clientName;
     }
 
-    /**
-     * Method splits input by any whitespace and return phrase from the indicated position
-     *
-     * @param text      input text
-     * @param position  non-negative positive number
-     * @return text without whitespaces
-     */
-    private String getPhraseAtPosition(final String text, final int position) {
-        checkArgument(position > 0, "Position must be positive: %s", position);
-        final String[] splittedMessage = text.split("\\s+");
-        checkArgument(position <= splittedMessage.length, "Incorrect position. Max value for passed input: %s", splittedMessage.length);
-        return splittedMessage[position - 1];
-    }
-
     private String addNode(final String message) {
-        final String nodeName = getPhraseAtPosition(message, 3);
+        final String nodeName = StringUtils.phraseAtPosition(message, 3);
         final Node node = new Node(nodeName);
         if (graph.addNode(node)) {
             return "NODE ADDED";
@@ -120,9 +105,9 @@ public class MessageProcessor {
     }
 
     private String addEdge(final String message) {
-        final String source = getPhraseAtPosition(message, 3);
-        final String target = getPhraseAtPosition(message, 4);
-        final int weight = Integer.parseInt(getPhraseAtPosition(message, 5));
+        final String source = StringUtils.phraseAtPosition(message, 3);
+        final String target = StringUtils.phraseAtPosition(message, 4);
+        final int weight = Integer.parseInt(StringUtils.phraseAtPosition(message, 5));
         final Edge edge = Edge.builder()
                               .source(new Node(source))
                               .target(new Node(target))
@@ -135,7 +120,7 @@ public class MessageProcessor {
     }
 
     private String removeNode(final String message) {
-        final String nodeName = getPhraseAtPosition(message, 3);
+        final String nodeName = StringUtils.phraseAtPosition(message, 3);
         final Node node = new Node(nodeName);
         if (graph.removeNode(node)) {
             return "NODE REMOVED";
@@ -144,8 +129,8 @@ public class MessageProcessor {
     }
 
     private String removeEdge(final String message) {
-        final String source = getPhraseAtPosition(message, 3);
-        final String target = getPhraseAtPosition(message, 4);
+        final String source = StringUtils.phraseAtPosition(message, 3);
+        final String target = StringUtils.phraseAtPosition(message, 4);
         if (graph.removeEdge(new Node(source), new Node(target))) {
             return "EDGE REMOVED";
         }
@@ -153,8 +138,8 @@ public class MessageProcessor {
     }
 
     private String calculateShortestPath(final String message) {
-        final String source = getPhraseAtPosition(message, 3);
-        final String target = getPhraseAtPosition(message, 4);
+        final String source = StringUtils.phraseAtPosition(message, 3);
+        final String target = StringUtils.phraseAtPosition(message, 4);
         final int shortestPath = graph.findTheShortestPath(new Node(source), new Node(target));
         if (shortestPath == -1) {
             return NODE_NOT_FOUND_MESSAGE;
@@ -163,8 +148,8 @@ public class MessageProcessor {
     }
 
     private String findAllCloserNodes(final String message) {
-        final int weight = Integer.parseInt(getPhraseAtPosition(message, 3));
-        final String nodeName = getPhraseAtPosition(message, 4);
+        final int weight = Integer.parseInt(StringUtils.phraseAtPosition(message, 3));
+        final String nodeName = StringUtils.phraseAtPosition(message, 4);
         try {
             final List<Node> nodes = graph.findAllCloserNodesThan(new Node(nodeName), weight);
             if (nodes.isEmpty()) {
