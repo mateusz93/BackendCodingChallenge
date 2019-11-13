@@ -13,6 +13,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.time.Instant;
+import java.util.UUID;
 
 @Slf4j
 public class SocketServer implements Runnable {
@@ -21,6 +23,7 @@ public class SocketServer implements Runnable {
     private static final String SERVER_PREFIX = "[SERVER] ";
     private final MessageProcessor messageProcessor;
     private final Socket socket;
+    private final UUID sessionId;
     private final int timeoutInMs;
     private PrintWriter out;
 
@@ -29,7 +32,8 @@ public class SocketServer implements Runnable {
         this.socket = socket;
         this.socket.setSoTimeout(timeoutInMs);
         this.timeoutInMs = timeoutInMs;
-        this.messageProcessor = new MessageProcessor(DirectedGraph.getInstance());
+        this.sessionId = UUID.randomUUID();
+        this.messageProcessor = new MessageProcessor(DirectedGraph.getInstance(), Instant.now());
     }
 
     public void run() {
@@ -78,8 +82,8 @@ public class SocketServer implements Runnable {
     }
 
     private void sendWelcomeMessage() {
-        log.debug(SERVER_PREFIX + messageProcessor.getWelcomeMessage());
-        out.println(messageProcessor.getWelcomeMessage());
+        log.debug(SERVER_PREFIX + messageProcessor.getWelcomeMessage(sessionId.toString()));
+        out.println(messageProcessor.getWelcomeMessage(sessionId.toString()));
     }
 
     private void sendTimeoutMessage() {

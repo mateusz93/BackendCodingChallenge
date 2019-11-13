@@ -76,7 +76,7 @@ public class DirectedGraph {
      * @param source    source node
      * @param target    target node
      * @return int      sum of the the shortest weights
-     *                  {@code -1} if node not exists
+     *                  {@code -1} if node does not exist
      *                  {@code Integer.MAX_VALUE} if not exists connection between nodes
      */
     public synchronized int findTheShortestPath(final Node source, final Node target) {
@@ -98,7 +98,7 @@ public class DirectedGraph {
      *
      * @param node          node
      * @param weight        weight
-     * @throws IllegalArgumentException if node not exists
+     * @throws IllegalArgumentException if node does not exist
      * @return List<Node>   all nodes that are closer to node than the given weight
      */
     public synchronized List<Node> findAllCloserNodesThan(final Node node, final int weight) {

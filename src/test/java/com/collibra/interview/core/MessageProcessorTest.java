@@ -8,6 +8,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.lang.reflect.Field;
+import java.time.Instant;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -23,7 +25,7 @@ class MessageProcessorTest {
         Field instance = DirectedGraph.class.getDeclaredField("instance");
         instance.setAccessible(true);
         instance.set(null, null);
-        resolver = new MessageProcessor(DirectedGraph.getInstance());
+        resolver = new MessageProcessor(DirectedGraph.getInstance(), Instant.now());
     }
 
     @ParameterizedTest
@@ -56,8 +58,8 @@ class MessageProcessorTest {
 
     @Test
     void shouldReturnWelcomeMessage() {
-        final String welcomeMessage = resolver.getWelcomeMessage();
-        assertTrue(welcomeMessage.matches("^HI, I AM [-a-zA-Z0-9]*$"));
+        final String name = UUID.randomUUID().toString();
+        assertEquals("HI, I AM " + name, resolver.getWelcomeMessage(name));
     }
 
     @Test
