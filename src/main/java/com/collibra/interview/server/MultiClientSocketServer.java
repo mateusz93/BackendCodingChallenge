@@ -19,7 +19,7 @@ public class MultiClientSocketServer {
     @SneakyThrows
     public void start() {
         log.info("Multi client server socket stared and listening on port {}", port);
-        final ExecutorService executor = Executors.newFixedThreadPool(32);
+        final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         try (final ServerSocket serverSocket = new ServerSocket(port)) {
             while (true) {
                 Socket socket = serverSocket.accept();
