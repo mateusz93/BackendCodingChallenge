@@ -1,6 +1,5 @@
 package com.collibra.interview.graph;
 
-import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.connectivity.ConnectivityInspector;
@@ -8,6 +7,7 @@ import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 
 import javax.annotation.concurrent.ThreadSafe;
+import java.util.stream.Collectors;
 
 @ThreadSafe
 public class DirectedGraph {
@@ -80,6 +80,10 @@ public class DirectedGraph {
      *                  {@code Integer.MAX_VALUE} if not exists connection between nodes
      */
     public synchronized int findTheShortestPath(final Node source, final Node target) {
+        return findTheShortestPath(graph, source, target);
+    }
+
+    private int findTheShortestPath(final DirectedWeightedMultigraph<Node, Edge> graph, final Node source, final Node target) {
         if (!graph.containsVertex(source) || !graph.containsVertex(target)) {
             return -1;
         }
@@ -105,10 +109,12 @@ public class DirectedGraph {
         if (!graph.containsVertex(node)) {
             throw new IllegalArgumentException("Node does not exist");
         }
-        final ConnectivityInspector inspector = new ConnectivityInspector(graph);
-        return HashSet.ofAll(inspector.connectedSetOf(node))
-                      .filter(n -> weight > findTheShortestPath(node, (Node) n))
-                      .filter(n -> !n.equals(node))
-                      .toList();
+        final ConnectivityInspector<Node, Edge> inspector = new ConnectivityInspector<>(graph);
+        return List.ofAll(inspector.connectedSetOf(node)
+                                   .parallelStream()
+                                   .filter(n -> weight > findTheShortestPath(graph, node, n))
+                                   .filter(n -> !n.equals(node))
+                                   .collect(Collectors.toList()));
+
     }
 }
