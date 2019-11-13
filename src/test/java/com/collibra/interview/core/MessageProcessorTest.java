@@ -132,6 +132,14 @@ class MessageProcessorTest {
     }
 
     @Test
+    void shouldThrowExceptionDuringCreatingEdgeWithNonPositiveWeight() throws UnsupportedCommandException {
+        resolver.process("ADD NODE phase2-node1");
+        resolver.process("ADD NODE phase2-node2");
+        assertThrows(IllegalArgumentException.class, () -> resolver.process("ADD EDGE phase2-node1 phase2-node2 0"), "Weight must be positive: 0");
+        assertThrows(UnsupportedCommandException.class, () -> resolver.process("ADD EDGE phase2-node1 phase2-node2 -1"), "SORRY, I DID NOT UNDERSTAND THAT");
+    }
+
+    @Test
     void shouldReturnNodeNotFoundMessageDuringEdgeRemoving() throws UnsupportedCommandException {
         assertEquals("ERROR: NODE NOT FOUND", resolver.process("REMOVE EDGE phase2-node1 phase2-node2"));
     }
