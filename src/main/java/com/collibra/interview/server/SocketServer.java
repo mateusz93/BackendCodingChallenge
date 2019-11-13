@@ -7,11 +7,9 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.time.Instant;
 import java.util.UUID;
@@ -42,7 +40,7 @@ public class SocketServer implements Runnable {
             out = new PrintWriter(socket.getOutputStream(), true);
             sendWelcomeMessage();
             String clientMessage;
-            while ((clientMessage = readClientMessage(in)) != null) {
+            while ((clientMessage = in.readLine()) != null) {
                 sendAnswer(clientMessage);
             }
         } catch (SocketTimeoutException e) {
@@ -54,15 +52,6 @@ public class SocketServer implements Runnable {
                 out.close();
             }
             log.info("Single client socket server closed");
-        }
-    }
-
-    private String readClientMessage(final BufferedReader in) throws IOException {
-        try {
-            return in.readLine();
-        } catch (SocketException e) {
-            log.warn("SocketException occurred during reading message from client. No answer will be send.");
-            return "";
         }
     }
 
