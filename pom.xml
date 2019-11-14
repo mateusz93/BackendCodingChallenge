@@ -6,7 +6,7 @@
 
     <groupId>com.collibra.interview</groupId>
     <artifactId>interview-app</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 
     <properties>
         <main-class>com.collibra.interview.Application</main-class>
