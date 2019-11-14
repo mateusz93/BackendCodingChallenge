@@ -1,5 +1,6 @@
 package com.collibra.interview.core;
 
+import com.collibra.interview.exception.NodeNotFoundException;
 import com.collibra.interview.graph.DirectedGraph;
 import com.collibra.interview.graph.Edge;
 import com.collibra.interview.graph.Node;
@@ -13,7 +14,7 @@ class EdgeProcessor extends BaseMessageProcessor {
         super(graph);
     }
 
-    String addEdge(final String message) {
+    String addEdge(final String message) throws NodeNotFoundException {
         final String source = StringUtils.phraseAtPosition(message, 3);
         final String target = StringUtils.phraseAtPosition(message, 4);
         final int weight = Integer.parseInt(StringUtils.phraseAtPosition(message, 5));
@@ -25,15 +26,15 @@ class EdgeProcessor extends BaseMessageProcessor {
         if (graph.addEdge(edge)) {
             return "EDGE ADDED";
         }
-        return NODE_NOT_FOUND_MESSAGE;
+        throw new NodeNotFoundException();
     }
 
-    String removeEdge(final String message) {
+    String removeEdge(final String message) throws NodeNotFoundException {
         final String source = StringUtils.phraseAtPosition(message, 3);
         final String target = StringUtils.phraseAtPosition(message, 4);
         if (graph.removeEdge(new Node(source), new Node(target))) {
             return "EDGE REMOVED";
         }
-        return NODE_NOT_FOUND_MESSAGE;
+        throw new NodeNotFoundException();
     }
 }

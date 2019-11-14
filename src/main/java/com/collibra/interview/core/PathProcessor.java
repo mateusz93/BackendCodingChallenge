@@ -1,5 +1,6 @@
 package com.collibra.interview.core;
 
+import com.collibra.interview.exception.NodeNotFoundException;
 import com.collibra.interview.graph.DirectedGraph;
 import com.collibra.interview.graph.Node;
 import com.collibra.interview.util.StringUtils;
@@ -12,12 +13,12 @@ class PathProcessor extends BaseMessageProcessor {
         super(graph);
     }
 
-    String calculateShortestPath(final String message) {
+    String calculateShortestPath(final String message) throws NodeNotFoundException {
         final String source = StringUtils.phraseAtPosition(message, 3);
         final String target = StringUtils.phraseAtPosition(message, 4);
         final int shortestPath = graph.findTheShortestPath(new Node(source), new Node(target));
         if (shortestPath == -1) {
-            return NODE_NOT_FOUND_MESSAGE;
+            throw new NodeNotFoundException();
         }
         return String.valueOf(shortestPath);
     }

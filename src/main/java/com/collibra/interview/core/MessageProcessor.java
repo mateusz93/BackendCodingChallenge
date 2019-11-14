@@ -1,5 +1,6 @@
 package com.collibra.interview.core;
 
+import com.collibra.interview.exception.MessageProcessingException;
 import com.collibra.interview.exception.UnsupportedCommandException;
 import com.collibra.interview.graph.DirectedGraph;
 import com.collibra.interview.util.StringUtils;
@@ -48,7 +49,7 @@ public class MessageProcessor {
         return "BYE " + clientName + ", WE SPOKE FOR " + ms + " MS";
     }
 
-    public String process(final String message) throws UnsupportedCommandException {
+    public String process(final String message) throws MessageProcessingException {
         if (isNotSupported(message)) {
             throw new UnsupportedCommandException();
         }

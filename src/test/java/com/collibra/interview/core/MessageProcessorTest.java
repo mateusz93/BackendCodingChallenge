@@ -1,6 +1,8 @@
 package com.collibra.interview.core;
 
-import com.collibra.interview.exception.UnsupportedCommandException;
+import com.collibra.interview.exception.MessageProcessingException;
+import com.collibra.interview.exception.NodeAlreadyExistsException;
+import com.collibra.interview.exception.NodeNotFoundException;
 import com.collibra.interview.graph.DirectedGraph;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,11 +50,11 @@ class MessageProcessorTest {
 
     @Test
     void shouldThrowUnsupportedException() {
-        assertThrows(UnsupportedCommandException.class, () -> resolver.process("UNKNOWN"), "SORRY, I DID NOT UNDERSTAND THAT");
+        assertThrows(MessageProcessingException.class, () -> resolver.process("UNKNOWN"), "SORRY, I DID NOT UNDERSTAND THAT");
     }
 
     @Test
-    void shouldReturnGreetingsMessage() throws UnsupportedCommandException {
+    void shouldReturnGreetingsMessage() throws MessageProcessingException {
         assertEquals("HI John", resolver.process("HI, I AM John"));
     }
 
@@ -63,7 +65,7 @@ class MessageProcessorTest {
     }
 
     @Test
-    void shouldReturnTimeoutMessage() throws UnsupportedCommandException {
+    void shouldReturnTimeoutMessage() throws MessageProcessingException {
         resolver.process("HI, I AM John");
         assertEquals("BYE John, WE SPOKE FOR 300 MS", resolver.getTimeoutMessage(300));
     }
@@ -74,7 +76,7 @@ class MessageProcessorTest {
     }
 
     @Test
-    void shouldReturnGoodbyeMessage() throws UnsupportedCommandException {
+    void shouldReturnGoodbyeMessage() throws MessageProcessingException {
         resolver.process("HI, I AM John");
         final String result = resolver.process("BYE MATE!");
         assertTrue(result.matches("^BYE John, WE SPOKE FOR \\d+ MS*$"));
@@ -86,47 +88,47 @@ class MessageProcessorTest {
     }
 
     @Test
-    void shouldReturnNodeAddedMessage() throws UnsupportedCommandException {
+    void shouldReturnNodeAddedMessage() throws MessageProcessingException {
         assertEquals("NODE ADDED", resolver.process("ADD NODE phase2-node1"));
     }
 
     @Test
-    void shouldReturnNodeAlreadyExistsMessage() throws UnsupportedCommandException {
+    void shouldReturnNodeAlreadyExistsMessage() throws MessageProcessingException {
         resolver.process("ADD NODE phase2-node1");
-        assertEquals("ERROR: NODE ALREADY EXISTS", resolver.process("ADD NODE phase2-node1"));
+        assertThrows(NodeAlreadyExistsException.class, () -> resolver.process("ADD NODE phase2-node1"), "ERROR: NODE ALREADY EXISTS");
     }
 
     @Test
-    void shouldReturnEdgeAddedMessageDuringAdding() throws UnsupportedCommandException {
+    void shouldReturnEdgeAddedMessageDuringAdding() throws MessageProcessingException {
         resolver.process("ADD NODE phase2-node1");
         resolver.process("ADD NODE phase2-node2");
         assertEquals("EDGE ADDED", resolver.process("ADD EDGE phase2-node1 phase2-node2 12"));
     }
 
     @Test
-    void shouldReturnEdgeAddedMessageDuringAddingEdgeWithTwoSameNodes() throws UnsupportedCommandException {
+    void shouldReturnEdgeAddedMessageDuringAddingEdgeWithTwoSameNodes() throws MessageProcessingException {
         resolver.process("ADD NODE phase2-node1");
         assertEquals("EDGE ADDED", resolver.process("ADD EDGE phase2-node1 phase2-node1 5"));
     }
 
     @Test
-    void shouldReturnNodeNotFoundMessage() throws UnsupportedCommandException {
-        assertEquals("ERROR: NODE NOT FOUND", resolver.process("ADD EDGE phase2-node1 phase2-node2 12"));
+    void shouldReturnNodeNotFoundMessage() {
+        assertThrows(NodeNotFoundException.class, () -> resolver.process("ADD EDGE phase2-node1 phase2-node2 12"), "ERROR: NODE NOT FOUND");
     }
 
     @Test
-    void shouldReturnNodeRemovedMessage() throws UnsupportedCommandException {
+    void shouldReturnNodeRemovedMessage() throws MessageProcessingException {
         resolver.process("ADD NODE phase2-node1");
         assertEquals("NODE REMOVED", resolver.process("REMOVE NODE phase2-node1"));
     }
 
     @Test
-    void shouldReturnNodeNotFoundMessageDuringRemoving() throws UnsupportedCommandException {
-        assertEquals("ERROR: NODE NOT FOUND", resolver.process("REMOVE NODE phase2-node1"));
+    void shouldReturnNodeNotFoundMessageDuringRemoving() {
+        assertThrows(NodeNotFoundException.class, () -> resolver.process("REMOVE NODE phase2-node1"), "ERROR: NODE NOT FOUND");
     }
 
     @Test
-    void shouldReturnEdgeRemovedMessage() throws UnsupportedCommandException {
+    void shouldReturnEdgeRemovedMessage() throws MessageProcessingException {
         resolver.process("ADD NODE phase2-node1");
         resolver.process("ADD NODE phase2-node2");
         resolver.process("ADD EDGE phase2-node1 phase2-node2 18");
@@ -134,20 +136,20 @@ class MessageProcessorTest {
     }
 
     @Test
-    void shouldThrowExceptionDuringCreatingEdgeWithNonPositiveWeight() throws UnsupportedCommandException {
+    void shouldThrowExceptionDuringCreatingEdgeWithNonPositiveWeight() throws MessageProcessingException {
         resolver.process("ADD NODE phase2-node1");
         resolver.process("ADD NODE phase2-node2");
         assertThrows(IllegalArgumentException.class, () -> resolver.process("ADD EDGE phase2-node1 phase2-node2 0"), "Weight must be positive: 0");
-        assertThrows(UnsupportedCommandException.class, () -> resolver.process("ADD EDGE phase2-node1 phase2-node2 -1"), "SORRY, I DID NOT UNDERSTAND THAT");
+        assertThrows(MessageProcessingException.class, () -> resolver.process("ADD EDGE phase2-node1 phase2-node2 -1"), "SORRY, I DID NOT UNDERSTAND THAT");
     }
 
     @Test
-    void shouldReturnNodeNotFoundMessageDuringEdgeRemoving() throws UnsupportedCommandException {
-        assertEquals("ERROR: NODE NOT FOUND", resolver.process("REMOVE EDGE phase2-node1 phase2-node2"));
+    void shouldReturnNodeNotFoundMessageDuringEdgeRemoving() {
+        assertThrows(NodeNotFoundException.class, () -> resolver.process("REMOVE EDGE phase2-node1 phase2-node2"), "ERROR: NODE NOT FOUND");
     }
 
     @Test
-    void shouldCalculateTheShortestDistanceBetweenTwoExistingNodes() throws UnsupportedCommandException {
+    void shouldCalculateTheShortestDistanceBetweenTwoExistingNodes() throws MessageProcessingException {
         resolver.process("ADD NODE phase3-node1");
         resolver.process("ADD NODE phase3-node2");
         resolver.process("ADD NODE phase3-node3");
@@ -157,15 +159,15 @@ class MessageProcessorTest {
     }
 
     @Test
-    void shouldCalculateTheShortestDistanceBetweenNonExistingNodes() throws UnsupportedCommandException {
+    void shouldCalculateTheShortestDistanceBetweenNonExistingNodes() throws MessageProcessingException {
         resolver.process("ADD NODE phase3-node1");
         resolver.process("ADD NODE phase3-node2");
         resolver.process("ADD EDGE phase3-node1 phase3-node2 12");
-        assertEquals("ERROR: NODE NOT FOUND", resolver.process("SHORTEST PATH phase3-node1 phase3-node3"));
+        assertThrows(NodeNotFoundException.class, () -> resolver.process("SHORTEST PATH phase3-node1 phase3-node3"), "ERROR: NODE NOT FOUND");
     }
 
     @Test
-    void shouldCalculateTheShortestDistanceBetweenNonConnectedNodes() throws UnsupportedCommandException {
+    void shouldCalculateTheShortestDistanceBetweenNonConnectedNodes() throws MessageProcessingException {
         resolver.process("ADD NODE phase3-node1");
         resolver.process("ADD NODE phase3-node2");
         resolver.process("ADD NODE phase3-node3");
@@ -174,7 +176,7 @@ class MessageProcessorTest {
     }
 
     @Test
-    void shouldFindAllCloserNodesThan() throws UnsupportedCommandException {
+    void shouldFindAllCloserNodesThan() throws MessageProcessingException {
         resolver.process("ADD NODE phase3-node1");
         resolver.process("ADD NODE phase3-node2");
         resolver.process("ADD NODE phase3-node3");
@@ -182,7 +184,7 @@ class MessageProcessorTest {
         resolver.process("ADD EDGE phase3-node1 phase3-node3 10");
         resolver.process("ADD EDGE phase3-node1 phase3-node2 12");
         resolver.process("ADD EDGE phase3-node2 phase3-node4 15");
-        assertEquals("ERROR: NODE NOT FOUND", resolver.process("CLOSER THAN 5 phase3-node5"));
+        assertThrows(NodeNotFoundException.class, () -> resolver.process("CLOSER THAN 5 phase3-node5"), "ERROR: NODE NOT FOUND");
         assertEquals("", resolver.process("CLOSER THAN 0 phase3-node1"));
         assertEquals("phase3-node3", resolver.process("CLOSER THAN 11 phase3-node1"));
         assertEquals("phase3-node2,phase3-node3", resolver.process("CLOSER THAN 13 phase3-node1"));

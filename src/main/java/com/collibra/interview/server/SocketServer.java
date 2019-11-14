@@ -1,7 +1,7 @@
 package com.collibra.interview.server;
 
 import com.collibra.interview.core.MessageProcessor;
-import com.collibra.interview.exception.UnsupportedCommandException;
+import com.collibra.interview.exception.MessageProcessingException;
 import com.collibra.interview.graph.DirectedGraph;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +64,7 @@ public class SocketServer implements Runnable {
             final String serverAnswer = messageProcessor.process(clientMessage);
             log.debug(SERVER_PREFIX + serverAnswer);
             out.println(serverAnswer);
-        } catch (UnsupportedCommandException e) {
+        } catch (MessageProcessingException e) {
             log.debug(SERVER_PREFIX + e.getMessage());
             out.println(e.getMessage());
         }
