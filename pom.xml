@@ -6,7 +6,7 @@
 
     <groupId>com.collibra.backend.challenge</groupId>
     <artifactId>backend-coding-challenge</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.1</version>
 
     <properties>
         <main-class>com.collibra.backend.challenge.Application</main-class>
