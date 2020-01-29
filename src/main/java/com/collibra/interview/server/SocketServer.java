@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.time.Instant;
 import java.util.UUID;
@@ -25,7 +26,7 @@ public class SocketServer implements Runnable {
     private final int timeoutInMs;
     private PrintWriter out;
 
-    @SneakyThrows
+    @SneakyThrows(SocketException.class)
     SocketServer(final Socket socket, final int timeoutInMs) {
         this.socket = socket;
         this.socket.setSoTimeout(timeoutInMs);
