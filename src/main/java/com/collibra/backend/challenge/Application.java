@@ -1,6 +1,6 @@
-package com.collibra.interview;
+package com.collibra.backend.challenge;
 
-import com.collibra.interview.server.MultiClientSocketServer;
+import com.collibra.backend.challenge.server.MultiClientSocketServer;
 
 public class Application {
 

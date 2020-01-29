@@ -1,4 +1,4 @@
-package com.collibra.interview.graph;
+package com.collibra.backend.challenge.graph;
 
 import lombok.Builder;
 import lombok.Value;

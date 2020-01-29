@@ -1,4 +1,4 @@
-package com.collibra.interview.graph;
+package com.collibra.backend.challenge.graph;
 
 import io.vavr.collection.List;
 import org.jgrapht.GraphPath;

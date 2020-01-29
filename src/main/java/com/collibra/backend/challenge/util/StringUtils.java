@@ -1,4 +1,4 @@
-package com.collibra.interview.util;
+package com.collibra.backend.challenge.util;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

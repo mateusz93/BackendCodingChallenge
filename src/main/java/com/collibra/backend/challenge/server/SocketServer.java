@@ -1,8 +1,8 @@
-package com.collibra.interview.server;
+package com.collibra.backend.challenge.server;
 
-import com.collibra.interview.core.MessageProcessor;
-import com.collibra.interview.exception.MessageProcessingException;
-import com.collibra.interview.graph.DirectedGraph;
+import com.collibra.backend.challenge.core.CoreMessageProcessor;
+import com.collibra.backend.challenge.core.MessageProcessingException;
+import com.collibra.backend.challenge.graph.DirectedGraph;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.time.Instant;
 import java.util.UUID;
@@ -19,19 +20,15 @@ public class SocketServer implements Runnable {
 
     private static final String CLIENT_PREFIX = "[CLIENT] ";
     private static final String SERVER_PREFIX = "[SERVER] ";
-    private final MessageProcessor messageProcessor;
+    private final CoreMessageProcessor messageProcessor;
     private final Socket socket;
-    private final UUID sessionId;
-    private final int timeoutInMs;
     private PrintWriter out;
 
-    @SneakyThrows
+    @SneakyThrows(SocketException.class)
     SocketServer(final Socket socket, final int timeoutInMs) {
         this.socket = socket;
         this.socket.setSoTimeout(timeoutInMs);
-        this.timeoutInMs = timeoutInMs;
-        this.sessionId = UUID.randomUUID();
-        this.messageProcessor = new MessageProcessor(DirectedGraph.getInstance(), Instant.now());
+        this.messageProcessor = new CoreMessageProcessor(DirectedGraph.getInstance(), UUID.randomUUID(), Instant.now());
     }
 
     public void run() {
@@ -71,13 +68,13 @@ public class SocketServer implements Runnable {
     }
 
     private void sendWelcomeMessage() {
-        log.debug(SERVER_PREFIX + messageProcessor.getWelcomeMessage(sessionId.toString()));
-        out.println(messageProcessor.getWelcomeMessage(sessionId.toString()));
+        log.debug(SERVER_PREFIX + messageProcessor.getWelcomeMessage());
+        out.println(messageProcessor.getWelcomeMessage());
     }
 
     private void sendTimeoutMessage() {
-        log.debug(SERVER_PREFIX + messageProcessor.getTimeoutMessage(timeoutInMs));
-        out.println(messageProcessor.getTimeoutMessage(timeoutInMs));
+        log.debug(SERVER_PREFIX + messageProcessor.getTimeoutMessage());
+        out.println(messageProcessor.getTimeoutMessage());
     }
 
 }
