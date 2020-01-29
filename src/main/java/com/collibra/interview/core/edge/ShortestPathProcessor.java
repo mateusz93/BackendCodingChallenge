@@ -1,19 +1,24 @@
-package com.collibra.interview.core;
+package com.collibra.interview.core.edge;
 
-import com.collibra.interview.exception.NodeNotFoundException;
+import com.collibra.interview.core.BaseMessageProcessor;
+import com.collibra.interview.core.node.NodeNotFoundException;
 import com.collibra.interview.graph.DirectedGraph;
 import com.collibra.interview.graph.Node;
 import com.collibra.interview.util.StringUtils;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
-class PathProcessor extends BaseMessageProcessor {
+public final class ShortestPathProcessor extends BaseMessageProcessor {
 
-    PathProcessor(final DirectedGraph graph) {
+    public ShortestPathProcessor(final DirectedGraph graph) {
         super(graph);
     }
 
-    String calculateShortestPath(final String message) throws NodeNotFoundException {
+    @Override
+    public boolean isApplicable(final String message) {
+        return message.startsWith("SHORTEST PATH");
+    }
+
+    @Override
+    public String process(final String message) {
         final String source = StringUtils.phraseAtPosition(message, 3);
         final String target = StringUtils.phraseAtPosition(message, 4);
         final int shortestPath = graph.findTheShortestPath(new Node(source), new Node(target));

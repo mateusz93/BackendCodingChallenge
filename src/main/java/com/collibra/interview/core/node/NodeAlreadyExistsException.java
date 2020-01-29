@@ -1,4 +1,6 @@
-package com.collibra.interview.exception;
+package com.collibra.interview.core.node;
+
+import com.collibra.interview.core.MessageProcessingException;
 
 public class NodeAlreadyExistsException extends MessageProcessingException {
 
