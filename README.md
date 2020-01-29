@@ -18,7 +18,7 @@ Application listening on port **50000** and generate unique UUID for every new s
 
 ## Requirements
 - Maven 3
-- JDK 8
+- OpenJDK 11
 
 ## Logging
 Application logs are stored in **logs/app.log** file. Configuration file path **src/main/resource/log4j2.xml** 
