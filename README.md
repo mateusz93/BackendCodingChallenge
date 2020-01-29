@@ -28,7 +28,7 @@ Application logs are stored in **logs/app.log** file. Configuration file path **
 * Use maven command `mvn clean install`. Output .jar file will be available in target directory.
  
 #### How to run the tool
-* Use java command `java -jar backend-coding-challenge-1.0-SNAPSHOT-jar-with-dependencies.jar`.
+* Use java command `java -jar backend-coding-challenge-1.0.1-jar-with-dependencies.jar`.
 
 ## Authors
 * **Mateusz Wieczorek** - wskmateusz@gmail.com
