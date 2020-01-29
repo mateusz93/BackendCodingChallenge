@@ -10,7 +10,7 @@
 
     <properties>
         <main-class>com.collibra.interview.Application</main-class>
-        <java.version>8</java.version>
+        <java.version>11</java.version>
         <encoding>UTF-8</encoding>
         <lombok.version>1.18.10</lombok.version>
         <vavr.version>0.10.2</vavr.version>
